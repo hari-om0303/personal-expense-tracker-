@@ -60,6 +60,7 @@ form.addEventListener('submit', function (e) {
 
     renderExpences();
     updatetotal();
+    updateChart();
     form.reset();
 });
 
@@ -117,6 +118,7 @@ expenseList.addEventListener('click', function (e) {
 
         renderExpences();
         updatetotal();
+        updateChart();
         return;
     }
 
