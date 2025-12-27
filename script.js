@@ -1,4 +1,4 @@
-// ===== SELECT ELEMENTS =====
+// SELECT ELEMENTS 
 const title = document.getElementById('title');
 const amount = document.getElementById('amount');
 const category = document.getElementById('category');
@@ -10,12 +10,13 @@ const form = document.getElementById('expense-form');
 const expenseList = document.getElementById('expense-list');
 const totalamount = document.getElementById('total-amount');
 const searchInput = document.getElementById('search-input');
+const categorySearch = document.getElementById('search-category');
 
-// ===== STATE =====
+//  STATE
 let expences = [];
-let editingId = null; // IMPORTANT: edit state
+let editingId = null;
 
-// ===== FORM SUBMIT (ADD / UPDATE) =====
+// FORM SUBMIT (ADD / UPDATE) 
 form.addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -32,7 +33,7 @@ form.addEventListener('submit', function (e) {
     }
 
     if (editingId === null) {
-        // ===== ADD MODE =====
+        // ADD MODE
         const newExpence = {
             id: Date.now(),
             title: expencetitle,
@@ -44,7 +45,7 @@ form.addEventListener('submit', function (e) {
 
         expences.push(newExpence);
     } else {
-        // ===== EDIT MODE =====
+        // EDIT MODE 
         expences.forEach(exp => {
             if (exp.id === editingId) {
                 exp.title = expencetitle;
@@ -59,13 +60,14 @@ form.addEventListener('submit', function (e) {
         addexpensebtn.textContent = "Add Expense";
     }
 
-    renderExpences();
+    // renderExpences();
+    renderExpences(expences);
     updatetotal();
     updateChart();
     form.reset();
 });
 
-// ===== RENDER EXPENSES =====
+// RENDER EXPENSES
 function renderExpences() {
     if (expences.length === 0) {
         expenseList.innerHTML = `
@@ -101,29 +103,30 @@ function renderExpences() {
     expenseList.innerHTML = html;
 }
 
-// ===== UPDATE TOTAL =====
+// UPDATE TOTAL
 function updatetotal() {
     const total = expences.reduce((sum, exp) => sum + exp.amount, 0);
     totalamount.textContent = `₹${total}`;
 }
 
 
-// ===== DELETE & EDIT (EVENT DELEGATION) =====
+// DELETE & EDIT (EVENT DELEGATION)
 expenseList.addEventListener('click', function (e) {
 
-    // ----- DELETE -----
+    // DELETE 
     const deleteBtn = e.target.closest('.boton2');
     if (deleteBtn) {
         const idToDelete = Number(deleteBtn.dataset.id);
         expences = expences.filter(exp => exp.id !== idToDelete);
 
-        renderExpences();
+        // renderExpences();
+        renderExpences(expences);
         updatetotal();
         updateChart();
         return;
     }
 
-    // ----- EDIT -----
+    // EDIT
     const editBtn = e.target.closest('.boton1');
     if (editBtn) {
         editingId = Number(editBtn.dataset.id);
@@ -142,26 +145,37 @@ expenseList.addEventListener('click', function (e) {
 });
 
 
-renderExpences();
+// renderExpences();
+renderExpences(expences);
 updatetotal();
 
 
-// ===== SEARCH FUNCTIONALITY =====
-searchInput.addEventListener('input' , function(e){
-    let searchItem = e.target.value.toLowerCase();
-    const filteredExpences = expences.filter(exp =>{
-        return exp.title.toLowerCase().includes(searchItem) || exp.category.toLowerCase().includes(searchItem)
-    })
+// SEARCH FUNCTIONALITY
+function applyFilters() {
+    const searchText = searchInput.value.toLowerCase().trim();
+    const selectedCategory = categorySearch.value;
+
+    const filteredExpences = expences.filter(exp => {
+        const matchesTitle = exp.title.toLowerCase().includes(searchText);
+
+        const matchesCategory = selectedCategory === "all" || exp.category === selectedCategory;
+
+        return matchesTitle && matchesCategory;
+    });
+
     renderExpences(filteredExpences);
-})
+}
 
-function renderExpences(filteredExpences = null) {
-    const expencesToRender = filteredExpences || expences;
+searchInput.addEventListener('input', applyFilters);
+categorySearch.addEventListener('change', applyFilters);
 
-    if (expencesToRender.length === 0) {
+
+function renderExpences(list = []) {
+
+    if (list.length === 0) {
         expenseList.innerHTML = `
             <p class="empty-text">
-                No expenses yet. Add your first expense above
+                No expenses found
             </p>
         `;
         return;
@@ -169,7 +183,7 @@ function renderExpences(filteredExpences = null) {
 
     let html = "";
 
-    expencesToRender.forEach(exp => {
+    list.forEach(exp => {
         html += `
         <div class="expense-item">
             <div class="expense-main">
