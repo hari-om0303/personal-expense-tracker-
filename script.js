@@ -9,6 +9,7 @@ const addexpensebtn = document.getElementById('add-expense-btn');
 const form = document.getElementById('expense-form');
 const expenseList = document.getElementById('expense-list');
 const totalamount = document.getElementById('total-amount');
+const searchInput = document.getElementById('search-input');
 
 // ===== STATE =====
 let expences = [];
@@ -143,3 +144,50 @@ expenseList.addEventListener('click', function (e) {
 
 renderExpences();
 updatetotal();
+
+
+// ===== SEARCH FUNCTIONALITY =====
+searchInput.addEventListener('input' , function(e){
+    let searchItem = e.target.value.toLowerCase();
+    const filteredExpences = expences.filter(exp =>{
+        return exp.title.toLowerCase().includes(searchItem) || exp.category.toLowerCase().includes(searchItem)
+    })
+    renderExpences(filteredExpences);
+})
+
+function renderExpences(filteredExpences = null) {
+    const expencesToRender = filteredExpences || expences;
+
+    if (expencesToRender.length === 0) {
+        expenseList.innerHTML = `
+            <p class="empty-text">
+                No expenses yet. Add your first expense above
+            </p>
+        `;
+        return;
+    }
+
+    let html = "";
+
+    expencesToRender.forEach(exp => {
+        html += `
+        <div class="expense-item">
+            <div class="expense-main">
+                <div class="expense-date">Date: ${exp.date}</div>
+                <div class="expense-title">Title: ${exp.title}</div>
+                <div class="expense-category">Category: ${exp.category}</div>
+            </div>
+
+            <div class="expense-note">Note: ${exp.note || ""}</div>
+            <div class="expense-amount">Amount: ₹${exp.amount}</div>
+
+            <div class="btn">
+                <button class="boton1" data-id="${exp.id}">Edit</button>
+                <button class="boton2" data-id="${exp.id}">Delete</button>
+            </div>
+        </div>
+        `;
+    });
+
+    expenseList.innerHTML = html;
+}

@@ -27,7 +27,7 @@ function updateChart() {
         expenseChart.update();
     } else {
         expenseChart = new Chart(chartCanvas, {
-            type: "pie",
+            type: "line",
             data: {
                 labels: labels,
                 datasets: [{
@@ -37,7 +37,7 @@ function updateChart() {
                         "#f87171",
                         "#60a5fa",
                         "#34d399",
-                        "#fbbf24",
+                        "#fbbf2a",
                         "#a78bfa"
                     ]
                 }]
